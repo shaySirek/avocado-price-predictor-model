@@ -1,5 +1,5 @@
 import pytest
-from .predict import predict
+import predict.predict as predictor
 
 
 @pytest.fixture
@@ -18,34 +18,34 @@ def data():
 
 
 def test_prediction_ok(data):
-    y = predict(data)
+    y = predictor.predict(data)
     assert type(y) == float
 
 
 def test_prediction_empty_data():
-    y = predict({})
+    y = predictor.predict({})
     assert y == 0
 
 
 def test_prediction_missing_data(data):
     del data['small_bags']
-    y = predict(data)
+    y = predictor.predict(data)
     assert y == 0
 
 
 def test_prediction_invalid_date(data):
     data['date'] = 'invalid'
-    y = predict(data)
+    y = predictor.predict(data)
     assert y == 0
 
 
 def test_prediction_invalid_type(data):
     data['organic'] = 'invalid'
-    y = predict(data)
+    y = predictor.predict(data)
     assert y == 0
 
 
 def test_prediction_invalid_region(data):
     data['region'] = 'invalid'
-    y = predict(data)
+    y = predictor.predict(data)
     assert y == 0
