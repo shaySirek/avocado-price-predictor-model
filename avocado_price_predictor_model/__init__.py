@@ -1,12 +1,12 @@
 import pickle
-from os.path import isfile, join
+import gdown
 
 
-path = '.'
-file = 'model.pkl'
+# Download model
+url = 'https://drive.google.com/uc?id=1UiH6y3kvlWcGTpH9AV9qsQrjJZ-X9f2s'
+path = 'model.pkl'
+gdown.download(url, path)
 
-if not isfile(file):
-    path = 'avocado_price_predictor_model'
-
-with open(join(path, file), 'rb') as f:
+# Load model
+with open(path, 'rb') as f:
     model = pickle.loads(f.read())
