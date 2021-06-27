@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any, Tuple
 import pandas as pd
 from . import model
 
@@ -9,33 +10,37 @@ given_cols = ['sold_plu_4046', 'sold_plu_4225', 'sold_plu_4770',
               'small_bags', 'large_bags', 'xlarge_bags', 'organic', 'region', 'date']
 
 
+def _get_data(avocado: dict, col: str) -> Tuple[bool, Any]:
+    valid = True
+    given_col = given_cols[cols.index(col)]
+    value = avocado[given_col]
+
+    if given_col == 'organic':
+        if type(value) != bool:
+            valid = False
+        else:
+            value = 'organic' if value else 'conventional'
+    elif given_col == 'date':
+        seasons = [3, 3, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3]
+        try:
+            month = datetime.strptime(value, '%Y-%m-%d').month
+            value = seasons[month - 1]
+        except ValueError as e:
+            valid = False
+        
+    return valid, value
+
+
 def _create_avocado_data_frame(avocado: dict) -> pd.DataFrame:
-    if avocado.keys() != given_cols:
+    if list(avocado.keys()) != given_cols:
         return None
 
-    invalid = False
-    def get_data(col: str):
-        given_col = given_cols[cols.index(col)]
-        data = avocado[given_col]
-
-        if given_col == 'organic':
-            if type(data) != bool:
-                invalid = True
-            else:
-                data = 'organic' if data else 'conventional'
-        elif given_col == 'date':
-            seasons = [3, 3, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3]
-            try:
-                month = datetime.strptime(data, '%Y-%m-%d').month
-                data = seasons[month - 1]
-            except ValueError as e:
-                invalid = True
-            
-        return data
-
-    data = list(map(get_data, cols))
-    if invalid:
+    data = [_get_data(avocado, col) for col in cols]
+    validations = [x[0] for x in data]
+    if not all(validations):
         return None
+
+    data = [x[1] for x in data]
         
     return pd.DataFrame([data], columns=cols)
 
@@ -71,7 +76,10 @@ def predict(avocado: dict) -> float:
 
     x = _create_avocado_data_frame(avocado)
     y = 0.0
-    if x:
-        y = model.predict(x).item()
+    if x is not None:
+        try:
+            y = model.predict(x).item()
+        except:
+            pass
 
     return round(y, 5)
