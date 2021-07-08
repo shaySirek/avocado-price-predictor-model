@@ -5,28 +5,27 @@ from datetime import datetime
 
 # seasons=months mapping
 seasons = [3, 3, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3]
+DATE_FORMAT = '%Y-%m-%d'
 
 
 def _prep_default(value: str) -> Tuple[bool, Any]:
     return True, value
 
 
-def _prep_organic(value: str) -> Tuple[bool, Any]:
-    if type(value) != bool:
+def _prep_organic(value: str) -> Tuple[bool, str]:
+    if not isinstance(value, bool):
         return False, value
 
-    value = 'organic' if value else 'conventional'
-    return True, value
+    return True, 'organic' if value else 'conventional'
 
 
-def _prep_date(value: str) -> Tuple[bool, Any]:
+def _prep_date(value: str) -> Tuple[bool, int]:
     try:
-        month = datetime.strptime(value, '%Y-%m-%d').month
+        month = datetime.strptime(value, DATE_FORMAT).month
     except ValueError as e:
         return False, value
 
-    value = seasons[month - 1]
-    return True, value
+    return True, seasons[month - 1]
 
 
 preprocess_function = defaultdict(lambda: _prep_default)

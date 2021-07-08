@@ -1,11 +1,13 @@
-from . import model
-from .load import create_avocado_data_frame
+from sklearn import pipeline as sk_pipeline
+from .load_data import create_avocado_data_frame
 
 
-def predict(avocado: dict) -> float:
+def predict(model: sk_pipeline.Pipeline, avocado: dict) -> float:
     """
     Parameters
     ----------
+    model : sklearn.pipeline.Pipeline
+        model to predict the price of a given avocado
     avocado : dict
         avocado instance data
 
@@ -17,6 +19,9 @@ def predict(avocado: dict) -> float:
 
     Example
     -------
+    import avocado_price_predictor_model.load_model as model_loader
+    import avocado_price_predictor_model.predict as predictor
+
     avocado = {
         'sold_plu_4046': 5,
         'sold_plu_4225': 6,
@@ -28,7 +33,9 @@ def predict(avocado: dict) -> float:
         'region': 'Albany',
         'date': '2020-12-27'
     }
-    price = predict(avocado)
+    model = model_loader.load_model(https://ml-models.com/mymodel)
+    if model:
+        price = predictor.predict(model, avocado)
     """
 
     x = create_avocado_data_frame(avocado)
